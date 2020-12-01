@@ -9,12 +9,16 @@ import os
 
 
 def cleanup_text(text):
-    # using OpenCV
     return "".join([c if ord(c) < 128 else "" for c in text]).strip()
 
 
-def ocr(imagePath, langs="en"):
-    filename = os.path.basename(imagePath)
+def ocr(imagePath, langs="en", outputPath=""):
+    outputFileName = os.path.basename(imagePath)
+    if outputPath != "":
+        outputFilePath = os.path.dirname(imagePath)
+        outputFileName = os.path.join(outputFilePath, '_' + outputFileName)
+    else:
+        outputFileName = '_' + outputFileName
     image = cv2.imread(imagePath)
     reader = Reader(langs, False)  # Without gpu
     results = reader.readtext(image)
@@ -36,4 +40,4 @@ def ocr(imagePath, langs="en"):
                     cv2.putText(image, text[0:9], (tl[0], tl[1] - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
-    cv2.imwrite('_' + filename, image)
+    cv2.imwrite(outputFileName, image)
