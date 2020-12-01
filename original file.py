@@ -6,18 +6,20 @@ from easyocr import Reader
 import argparse
 import cv2
 
+
 def cleanup_text(text):
     # using OpenCV
     return "".join([c if ord(c) < 128 else "" for c in text]).strip()
 
+
 # Phần khai báo các đối số
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
-    help="path to input image to be OCR'd")
+                help="path to input image to be OCR'd")
 ap.add_argument("-l", "--langs", type=str, default="en",
-    help="comma separated list of languages to OCR")
+                help="comma separated list of languages to OCR")
 ap.add_argument("-g", "--gpu", type=int, default=-1,
-    help="whether or not GPU should be used")
+                help="whether or not GPU should be used")
 args = vars(ap.parse_args())
 
 # Tách phần chữ nếu có dấu ','
@@ -46,12 +48,12 @@ for (bbox, text, prob) in results:
 
     # Một vài điều kiện để chọn đầu ra
     text = cleanup_text(text)
-    if len(text) in range(4,20):
+    if len(text) in range(4, 20):
         if ((tl[0] > 20) and (tr[0] > 20)):
             if (text[0] == '0'):
                 cv2.rectangle(image, tl, br, (0, 255, 0), 2)
                 cv2.putText(image, text[0:9], (tl[0], tl[1] - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
 filename = 'savedImage_7.jpg'
 
@@ -61,4 +63,3 @@ cv2.imshow("Image", image)
 cv2.waitKey(0)
 # Đọc code bằng câu lênh ở terminal
 # python easy_ocr.py --image images/arabic_sign.jpg --langs en,ar
-
