@@ -4,11 +4,13 @@ import pytesseract
 import cv2
 import os
 from os import listdir
+import time
 
 min_confidence = 0.5
 width = 320
 height = 320
 padding = 0
+pytesseract.pytesseract.tesseract_cmd = 'C:\\Users\\quoct\\AppData\\Local\\Programs\\Tesseract-OCR\\tesseract.exe'
 
 
 def LoadImages(folderPath):
@@ -59,6 +61,7 @@ def decode_predictions(scores, geometry):
 
 
 def OCR(imagePath, eastDetectorPath='Model/frozen_east_text_detection.pb', outputPath=''):
+    start = time.time()
     outputFileName = os.path.basename(imagePath)
     if outputPath != "":
         outputFilePath = os.path.dirname(imagePath)
@@ -109,7 +112,8 @@ def OCR(imagePath, eastDetectorPath='Model/frozen_east_text_detection.pb', outpu
 
         roi = orig[startY:endY, startX:endX]
 
-        config = ("-l eng --oem 1 --psm 7")
+        #config = ("-l eng --oem 1 --psm 7")
+        config = ("--oem 1 --psm 7 tessedit_char_whitelist=0123456789")
         text = pytesseract.image_to_string(roi, config=config)
 
         results.append(((startX, startY, endX, endY), text))
@@ -126,12 +130,16 @@ def OCR(imagePath, eastDetectorPath='Model/frozen_east_text_detection.pb', outpu
 
         cv2.imwrite(outputFileName, output)
 
+    end = time.time()
+    print(str.format('Processed image in {:.2f} ms', (end - start) * 1000))
+
 
 def OCR_WithOutput(imageFolderPath, eastDetectorPath='Model/frozen_east_text_detection.pb', outputFolderPath=''):
     images = LoadImages(imageFolderPath)
     index = 0
     for image in images:
         index += 1
+        start = time.time()
         orig = image.copy()
         (origH, origW) = image.shape[:2]
 
@@ -174,7 +182,7 @@ def OCR_WithOutput(imageFolderPath, eastDetectorPath='Model/frozen_east_text_det
 
             roi = orig[startY:endY, startX:endX]
 
-            config = ("-l eng --oem 1 --psm 7")
+            config = ("--oem 1 --psm 7 tessedit_char_whitelist=0123456789")
             text = pytesseract.image_to_string(roi, config=config)
 
             results.append(((startX, startY, endX, endY), text))
@@ -192,6 +200,11 @@ def OCR_WithOutput(imageFolderPath, eastDetectorPath='Model/frozen_east_text_det
             outputFileName = os.path.join(
                 outputFolderPath, str(index) + ".jpg")
             cv2.imwrite(outputFileName, output)
+
+        end = time.time()
+        print(str.format('Processed no. {} image in {:.2f} ms',
+                         index, (end - start) * 1000))
+
 
 if __name__ == "__main__":
     OCR_WithOutput('D:\Github\OCR\Images',

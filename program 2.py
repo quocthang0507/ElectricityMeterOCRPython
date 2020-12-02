@@ -2,6 +2,7 @@ from easyocr import Reader
 import cv2
 import os
 from os import listdir
+import time
 
 
 def CleanupText(text):
@@ -19,6 +20,7 @@ def LoadImages(folderPath):
 
 
 def OCR(imagePath, langs="en", outputPath=""):
+    start = time.time()
     outputFileName = os.path.basename(imagePath)
     if outputPath != "":
         outputFilePath = os.path.dirname(imagePath)
@@ -30,8 +32,6 @@ def OCR(imagePath, langs="en", outputPath=""):
     results = reader.readtext(image)
 
     for (bbox, text, prob) in results:
-        print("[INFO] {:.4f}: {}".format(prob, text))
-
         (tl, tr, br, bl) = bbox
         tl = (int(tl[0]), int(tl[1]))
         tr = (int(tr[0]), int(tr[1]))
@@ -47,6 +47,8 @@ def OCR(imagePath, langs="en", outputPath=""):
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
     cv2.imwrite(outputFileName, image)
+    end = time.time()
+    print(str.format('Processed image in {:.2f} ms', (end - start) * 1000))
 
 
 def OCR_WithOutput(imageFolderPath, langs=['en'], outputFolderPath=""):
@@ -56,11 +58,11 @@ def OCR_WithOutput(imageFolderPath, langs=['en'], outputFolderPath=""):
     index = 0
     for image in images:
         index += 1
+        start = time.time()
+        print(str.format('Processing no. {} image', index))
         results = reader.readtext(image)
 
         for (bbox, text, prob) in results:
-            print("[INFO] {:.4f}: {}".format(prob, text))
-
             (tl, tr, br, bl) = bbox
             tl = (int(tl[0]), int(tl[1]))
             tr = (int(tr[0]), int(tr[1]))
@@ -74,8 +76,12 @@ def OCR_WithOutput(imageFolderPath, langs=['en'], outputFolderPath=""):
                         cv2.rectangle(image, tl, br, (0, 255, 0), 2)
                         cv2.putText(image, text[0:9], (tl[0], tl[1] - 10),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+
         outputFileName = os.path.join(outputFolderPath, str(index) + ".jpg")
         cv2.imwrite(outputFileName, image)
+        end = time.time()
+        print(str.format('Processed no. {} image in {:.2f} ms',
+                         index, (end - start) * 1000))
 
 
 if __name__ == "__main__":
