@@ -1,18 +1,24 @@
-# Chạy code trên terminal bằng câu lệnh sau
-# python easy_ocr.py --image images/arabic_sign.jpg --langs en,ar
-
-# import the necessary packages
 from easyocr import Reader
-import argparse
 import cv2
 import os
+from os import listdir
 
 
-def cleanup_text(text):
+def CleanupText(text):
     return "".join([c if ord(c) < 128 else "" for c in text]).strip()
 
 
-def ocr(imagePath, langs="en", outputPath=""):
+def LoadImages(folderPath):
+    files = listdir(folderPath)
+    images = []
+    for file in files:
+        img = cv2.imread(os.path.join(folderPath, file))
+        if img is not None:
+            images.append(img)
+    return images
+
+
+def OCR(imagePath, langs="en", outputPath=""):
     outputFileName = os.path.basename(imagePath)
     if outputPath != "":
         outputFilePath = os.path.dirname(imagePath)
@@ -32,7 +38,7 @@ def ocr(imagePath, langs="en", outputPath=""):
         br = (int(br[0]), int(br[1]))
         bl = (int(bl[0]), int(bl[1]))
 
-        text = cleanup_text(text)
+        text = CleanupText(text)
         if len(text) in range(4, 20):
             if ((tl[0] > 20) and (tr[0] > 20)):
                 if (text[0] == '0'):
@@ -41,3 +47,37 @@ def ocr(imagePath, langs="en", outputPath=""):
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
     cv2.imwrite(outputFileName, image)
+
+
+def OCR_WithOutput(imageFolderPath, langs=['en'], outputFolderPath=""):
+    images = LoadImages(imageFolderPath)
+    reader = Reader(langs, False, 'Model/', 'Model/',
+                    download_enabled=False)  # Without gpu
+    index = 0
+    for image in images:
+        index += 1
+        results = reader.readtext(image)
+
+        for (bbox, text, prob) in results:
+            print("[INFO] {:.4f}: {}".format(prob, text))
+
+            (tl, tr, br, bl) = bbox
+            tl = (int(tl[0]), int(tl[1]))
+            tr = (int(tr[0]), int(tr[1]))
+            br = (int(br[0]), int(br[1]))
+            bl = (int(bl[0]), int(bl[1]))
+
+            text = CleanupText(text)
+            if len(text) in range(4, 20):
+                if ((tl[0] > 20) and (tr[0] > 20)):
+                    if (text[0] == '0'):
+                        cv2.rectangle(image, tl, br, (0, 255, 0), 2)
+                        cv2.putText(image, text[0:9], (tl[0], tl[1] - 10),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+        outputFileName = os.path.join(outputFolderPath, str(index) + ".jpg")
+        cv2.imwrite(outputFileName, image)
+
+
+if __name__ == "__main__":
+    OCR_WithOutput('D:\Github\OCR\Images',
+                   outputFolderPath='D:\Github\OCR\Output')
