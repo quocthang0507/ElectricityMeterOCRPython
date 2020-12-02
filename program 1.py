@@ -58,7 +58,7 @@ def decode_predictions(scores, geometry):
     return (rects, confidences)
 
 
-def OCR(imagePath, eastDetectorPath='Model/', outputPath=''):
+def OCR(imagePath, eastDetectorPath='Model/frozen_east_text_detection.pb', outputPath=''):
     outputFileName = os.path.basename(imagePath)
     if outputPath != "":
         outputFilePath = os.path.dirname(imagePath)
@@ -81,7 +81,6 @@ def OCR(imagePath, eastDetectorPath='Model/', outputPath=''):
         "feature_fusion/Conv_7/Sigmoid",
         "feature_fusion/concat_3"]
 
-    print("[INFO] loading EAST text detector...")
     net = cv2.dnn.readNet(eastDetectorPath)
 
     blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
@@ -118,10 +117,6 @@ def OCR(imagePath, eastDetectorPath='Model/', outputPath=''):
     results = sorted(results, key=lambda r: r[0][1])
 
     for ((startX, startY, endX, endY), text) in results:
-        print("OCR TEXT")
-        print("========")
-        print("{}\n".format(text))
-
         text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
         output = orig.copy()
         cv2.rectangle(output, (startX, startY), (endX, endY),
@@ -130,3 +125,74 @@ def OCR(imagePath, eastDetectorPath='Model/', outputPath=''):
                     cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
 
         cv2.imwrite(outputFileName, output)
+
+
+def OCR_WithOutput(imageFolderPath, eastDetectorPath='Model/frozen_east_text_detection.pb', outputFolderPath=''):
+    images = LoadImages(imageFolderPath)
+    index = 0
+    for image in images:
+        index += 1
+        orig = image.copy()
+        (origH, origW) = image.shape[:2]
+
+        (newW, newH) = (width, height)
+        rW = origW / float(newW)
+        rH = origH / float(newH)
+
+        image = cv2.resize(image, (newW, newH))
+        (H, W) = image.shape[:2]
+
+        layerNames = [
+            "feature_fusion/Conv_7/Sigmoid",
+            "feature_fusion/concat_3"]
+
+        net = cv2.dnn.readNet(eastDetectorPath)
+
+        blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
+                                     (123.68, 116.78, 103.94), swapRB=True, crop=False)
+        net.setInput(blob)
+        (scores, geometry) = net.forward(layerNames)
+
+        (rects, confidences) = decode_predictions(scores, geometry)
+        boxes = non_max_suppression(np.array(rects), probs=confidences)
+
+        results = []
+
+        for (startX, startY, endX, endY) in boxes:
+            startX = int(startX * rW)
+            startY = int(startY * rH)
+            endX = int(endX * rW)
+            endY = int(endY * rH)
+
+            dX = int((endX - startX) * padding)
+            dY = int((endY - startY) * padding)
+
+            startX = max(0, startX - dX)
+            startY = max(0, startY - dY)
+            endX = min(origW, endX + (dX * 2))
+            endY = min(origH, endY + (dY * 2))
+
+            roi = orig[startY:endY, startX:endX]
+
+            config = ("-l eng --oem 1 --psm 7")
+            text = pytesseract.image_to_string(roi, config=config)
+
+            results.append(((startX, startY, endX, endY), text))
+
+        results = sorted(results, key=lambda r: r[0][1])
+
+        for ((startX, startY, endX, endY), text) in results:
+            text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
+            output = orig.copy()
+            cv2.rectangle(output, (startX, startY), (endX, endY),
+                          (0, 0, 255), 2)
+            cv2.putText(output, text, (startX, startY - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+
+            outputFileName = os.path.join(
+                outputFolderPath, str(index) + ".jpg")
+            cv2.imwrite(outputFileName, output)
+
+if __name__ == "__main__":
+    OCR_WithOutput('D:\Github\OCR\Images',
+                   outputFolderPath='D:\Github\OCR\Output')
