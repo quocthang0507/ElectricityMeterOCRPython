@@ -19,7 +19,7 @@ def LoadImages(folderPath):
     return images
 
 
-def OCR(imagePath, langs="en", outputPath=""):
+def OCR(imagePath, langs=["en", "ar"], outputPath=""):
     start = time.time()
     outputFileName = os.path.basename(imagePath)
     if outputPath != "":
@@ -28,7 +28,11 @@ def OCR(imagePath, langs="en", outputPath=""):
     else:
         outputFileName = '_' + outputFileName
     image = cv2.imread(imagePath)
-    reader = Reader(langs, False)  # Without gpu
+
+    # reader = Reader(langs, False)  # Without gpu
+    reader = Reader(langs, False, 'Model/', 'Model/',
+                    download_enabled=False)  # Without gpu
+
     results = reader.readtext(image)
 
     for (bbox, text, prob) in results:
