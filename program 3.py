@@ -37,7 +37,9 @@ def OCR(imagePath, langs=["en", "ar"], outputPath=""):
 
     image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
-    reader = Reader(langs, False)  # Without GPU
+    reader = Reader(langs, False, 'Model/', 'Model/',
+                    download_enabled=False)  # Without gpu
+
     results = reader.readtext(image)
 
     for (bbox, text, prob) in results:
@@ -62,7 +64,8 @@ def OCR(imagePath, langs=["en", "ar"], outputPath=""):
 
 def OCR_WithOutput(imageFolderPath, langs=["en", "ar"], outputFolderPath=""):
     images = LoadImages(imageFolderPath)
-    reader = Reader(langs, False)  # Without GPU
+    reader = Reader(langs, False, 'Model/', 'Model/',
+                    download_enabled=False)  # Without gpu
 
     index = 0
     scale_percent = 70
