@@ -61,7 +61,6 @@ def decode_predictions(scores, geometry):
 
 
 def OCR(imagePath, eastDetectorPath='Model/frozen_east_text_detection.pb', outputPath=''):
-    start = time.time()
     outputFileName = os.path.basename(imagePath)
     if outputPath != "":
         outputFilePath = os.path.dirname(imagePath)
@@ -69,6 +68,7 @@ def OCR(imagePath, eastDetectorPath='Model/frozen_east_text_detection.pb', outpu
     else:
         outputFileName = '_' + outputFileName
 
+    start = time.time()
     image = cv2.imread(imagePath)
     orig = image.copy()
     (origH, origW) = image.shape[:2]

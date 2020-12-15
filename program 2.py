@@ -20,13 +20,14 @@ def LoadImages(folderPath):
 
 
 def OCR(imagePath, langs=["en", "ar"], outputPath=""):
-    start = time.time()
     outputFileName = os.path.basename(imagePath)
     if outputPath != "":
         outputFilePath = os.path.dirname(imagePath)
         outputFileName = os.path.join(outputFilePath, '_' + outputFileName)
     else:
         outputFileName = '_' + outputFileName
+    
+    start = time.time()
     image = cv2.imread(imagePath)
 
     # reader = Reader(langs, False)  # Without gpu
@@ -62,8 +63,9 @@ def OCR_WithOutput(imageFolderPath, langs=['en'], outputFolderPath=""):
     index = 0
     for image in images:
         index += 1
-        start = time.time()
         print(str.format('Processing no. {} image', index))
+        
+        start = time.time()
         results = reader.readtext(image)
 
         for (bbox, text, prob) in results:
