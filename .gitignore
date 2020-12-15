@@ -128,3 +128,4 @@ dmypy.json
 .png
 latin.pth
 arabic.pth
+yolov4-custom_last.weights
