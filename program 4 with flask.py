@@ -25,7 +25,8 @@ def cleanup_text(result):
 
 
 # need to run only once to load model into memory
-reader = easyocr.Reader(['en'], gpu=False)
+reader = easyocr.Reader(['en'], False, 'Model/', 'Model/',
+                        download_enabled=False)  # Without gpu
 
 CONFIDENCE_THRESHOLD = 0.8
 NMS_THRESHOLD = 0.5
