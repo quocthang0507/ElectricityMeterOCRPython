@@ -1,4 +1,4 @@
-#!d:\github\ocr\ocr-env\scripts\python.exe
+#!d:\github\ElectricityMeterOCRPython\ocr-env\scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'pytesseract==0.3.6','console_scripts','pytesseract'
 import re
 import sys

@@ -1,4 +1,4 @@
-#!d:\github\ocr\ocr-env\scripts\python.exe
+#!d:\github\ElectricityMeterOCRPython\ocr-env\scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'future==0.18.2','console_scripts','pasteurize'
 import re
 import sys

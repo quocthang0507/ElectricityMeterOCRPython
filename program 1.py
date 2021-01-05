@@ -207,5 +207,5 @@ def OCR_WithOutput(imageFolderPath, eastDetectorPath='Model/frozen_east_text_det
 
 
 if __name__ == "__main__":
-    OCR_WithOutput('D:\Github\OCR\Images',
-                   outputFolderPath='D:\Github\OCR\Output')
+    OCR_WithOutput('D:\Github\ElectricityMeterOCRPython\Images',
+                   outputFolderPath='D:\Github\ElectricityMeterOCRPython\Output')

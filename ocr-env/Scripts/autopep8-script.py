@@ -1,4 +1,4 @@
-#!d:\Github\OCR\ocr-env\Scripts\python.exe
+#!d:\Github\ElectricityMeterOCRPython\ocr-env\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'autopep8==1.5.4','console_scripts','autopep8'
 import re
 import sys

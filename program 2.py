@@ -91,5 +91,5 @@ def OCR_WithOutput(imageFolderPath, langs=['en'], outputFolderPath=""):
 
 
 if __name__ == "__main__":
-    OCR_WithOutput('D:\Github\OCR\Images',
-                   outputFolderPath='D:\Github\OCR\Output')
+    OCR_WithOutput('D:\Github\ElectricityMeterOCRPython\Images',
+                   outputFolderPath='D:\Github\ElectricityMeterOCRPython\Output')
