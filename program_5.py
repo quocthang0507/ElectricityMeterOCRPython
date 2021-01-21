@@ -1,5 +1,4 @@
 from easyocr import Reader
-import argparse
 import cv2
 import os
 from os import listdir
